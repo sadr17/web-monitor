@@ -3,15 +3,17 @@ WORKDIR /app
 EXPOSE 80
 
 FROM microsoft/aspnetcore-build:2.0 AS build
-WORKDIR /src
+WORKDIR /back-end
 COPY *.sln ./
-COPY ./src ./
+COPY ./src/api/WebMonitorApi/WebMonitorApi.csproj ./src/api/WebMonitorApi/
+COPY ./src/monitor/Monitor/Monitor.csproj ./src/monitor/Monitor/
+COPY ./tests/WebMonitor.Tests/WebMonitor.Tests.csproj ./tests/WebMonitor.Tests/WebMonitor.Tests.csproj
 RUN dotnet restore
 COPY . .
-RUN dotnet build -c Release -o /app
+RUN dotnet build WebMonitor.sln -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app
+RUN dotnet publish WebMonitor.sln -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
