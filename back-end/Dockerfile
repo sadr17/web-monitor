@@ -18,4 +18,5 @@ RUN dotnet publish WebMonitor.sln -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+EXPOSE 54131
 ENTRYPOINT ["dotnet", "WebMonitorApi.dll"]
