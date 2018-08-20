@@ -8,3 +8,11 @@
 /monitor/Monitor/obj
 /monitor/Monitor/bin/
 
+/back-end/src/api/WebMonitorApi/bin
+/back-end/.vs
+/back-end/obj
+/back-end/src/api/WebMonitorApi/obj
+/back-end/src/monitor/Monitor/obj
+/back-end/src/monitor/Monitor/bin
+/back-end/tests/WebMonitor.Tests/bin
+/back-end/tests/WebMonitor.Tests/obj

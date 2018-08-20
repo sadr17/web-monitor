@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\api\WebMonitorApi\WebMonitorApi.csproj" />
-    <ProjectReference Include="..\..\..\monitor\Monitor\Monitor.csproj" />
+    <ProjectReference Include="..\..\src\api\WebMonitorApi\WebMonitorApi.csproj" />
+    <ProjectReference Include="..\..\src\monitor\Monitor\Monitor.csproj" />
   </ItemGroup>
 
 </Project>
