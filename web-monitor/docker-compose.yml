@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  webmonitorapi:
+    image: webmonitorapi
+    build:
+      context: .
+      dockerfile: ../fix_test/api/WebMonitorApi/Dockerfile

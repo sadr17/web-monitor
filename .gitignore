@@ -1,0 +1,10 @@
+/web-monitor/.vs
+/web-monitor/obj
+/web-monitor/bin
+/web-monitor/tests/WebMonitor.Tests/bin
+/web-monitor/tests/WebMonitor.Tests/obj
+/api/WebMonitorApi/obj/
+/api/WebMonitorApi/bin
+/monitor/Monitor/obj
+/monitor/Monitor/bin/
+
