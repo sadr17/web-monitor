@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Web monitor",
+  "name": "Web monitor",
   "icons": [
     {
       "src": "favicon.ico",

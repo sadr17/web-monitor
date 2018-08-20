@@ -24,8 +24,6 @@ import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
 import * as signalR from '@aspnet/signalr'
 
-const URL = 'http://localhost:54131/api/webpages';
-  
   const AddButton = ({ onExecute }) => (
     <IconButton color='primary' onClick={onExecute} title="Create new record">
       <AddIcon />
@@ -124,6 +122,14 @@ export class WebPagesView extends React.PureComponent {
     this.deleteRows = this.deleteRows.bind(this);
   }
 
+  getApiUrl = () => {
+    return process.env.REACT_APP_API_URL + process.env.REACT_APP_API_PATH;
+  }
+
+  getUpdateUrl = () => {
+    return process.env.REACT_APP_API_URL + process.env.REACT_APP_UPDATE_PATH;
+  }
+
   componentDidMount() {
     this.loadData();
     this.createHub()  
@@ -164,7 +170,7 @@ export class WebPagesView extends React.PureComponent {
     let { rows } = this.state;
     if (added) {
       const addedPage = JSON.stringify(added[0]);
-      sendRequest(URL, 'post', addedPage)
+      sendRequest(this.getApiUrl(), 'post', addedPage)
       .then(result => result.json())
       .then((data) => {
         rows = [...rows, data];
@@ -174,7 +180,7 @@ export class WebPagesView extends React.PureComponent {
     else if (changed) {     
       const item = rows.filter(row => changed[row.id])[0];       
       const updatedPage = JSON.stringify({ ...item, ...changed[item.id] });
-      sendRequest(URL, 'post', updatedPage)
+      sendRequest(this.getApiUrl(), 'post', updatedPage)
       .then(result => result.json())
       .then((data) => {
         rows = rows.map(row => (changed[row.id] ? { ...row, ...data } : row));
@@ -194,7 +200,7 @@ export class WebPagesView extends React.PureComponent {
     this.getStateDeletingRows().forEach((rowId) => {
       const index = rows.findIndex((row) => row.id === rowId);
       if (index > -1) {
-        sendRequest(URL+ '/' + rowId, 'delete', null)
+        sendRequest(this.getApiUrl()+ '/' + rowId, 'delete', null)
         .then((result) => {
           rows.splice(index, 1);
           this.setState({ rows, deletingRows: [] });
@@ -208,7 +214,7 @@ export class WebPagesView extends React.PureComponent {
       return;
 
     const hubConnection = new signalR.HubConnectionBuilder()
-        .withUrl('http://localhost:54131/updateHub')
+        .withUrl(this.getUpdateUrl())
         .build();
     hubConnection.start()
         .catch(err => console.log('Error while establishing connection :('));
@@ -220,11 +226,11 @@ export class WebPagesView extends React.PureComponent {
   }
 
   loadData() {
-    if (URL === this.lastQuery) {
+    if (this.getApiUrl() === this.lastQuery) {
       this.setState({ loading: false });
       return;
     }
-    sendRequest(URL, 'GET', null)
+    sendRequest(this.getApiUrl(), 'GET', null)
     .then(result => result.json())
     .then((data) => {
         this.setState({
@@ -232,7 +238,7 @@ export class WebPagesView extends React.PureComponent {
              loading: false,
         });
     });
-    this.lastQuery = URL;
+    this.lastQuery = this.getApiUrl();
   }
 
   render() {
