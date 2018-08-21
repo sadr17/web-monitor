@@ -19,7 +19,7 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void CreateWebPage()
     {
-      var controller = new WebPagesController(new WebPages());
+      var controller = new WebPagesController(new TestWebPages());
       var pages = controller.GetAll();
       var original = new List<WebPage>(pages);
 
@@ -42,7 +42,7 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void DeleteWebPage()
     {
-      var controller = new WebPagesController(new WebPages());
+      var controller = new WebPagesController(new TestWebPages());
 
       var p = new WebPage()
       {
@@ -62,7 +62,7 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void UpdatePage()
     {
-      var controller = new WebPagesController(new WebPages());
+      var controller = new WebPagesController(new TestWebPages());
 
       var p = new WebPage()
       {

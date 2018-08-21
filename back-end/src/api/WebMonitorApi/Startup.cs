@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monitor;
@@ -23,24 +24,31 @@ namespace WebMonitorApi
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddMvc();
-      services.AddSignalR().AddHubOptions<UpdateStatusHub>((hub) =>
-      {
-        hub.EnableDetailedErrors = true;
-      });
-
-      services.AddScoped<IRepository<WebPage>, WebPages>();
-      services.AddSingleton<WebPagesMonitor>();
+      services.AddSignalR()
+        .AddHubOptions<UpdateStatusHub>((hub) =>
+        {
+          hub.EnableDetailedErrors = true;
+        });
 
       var corsBuilder = new CorsPolicyBuilder();
       corsBuilder.AllowAnyHeader();
       corsBuilder.AllowAnyMethod();
-      corsBuilder.AllowAnyOrigin(); 
+      corsBuilder.AllowAnyOrigin();
       corsBuilder.AllowCredentials();
 
       services.AddCors(options =>
       {
         options.AddPolicy("SiteCorsPolicy", corsBuilder.Build());
       });
+
+      services.AddEntityFrameworkNpgsql()
+        .AddDbContext<WebPagesContext>(options =>
+        {
+          options.UseNpgsql(Configuration["Data:WebPagesContext:ConnectionString"]);
+        });
+
+      services.AddScoped<IRepository<WebPage>, WebPages>();
+      services.AddSingleton<WebPagesMonitor>();
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)

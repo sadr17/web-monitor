@@ -2,6 +2,8 @@ version: '3'
 services:
   backend:
     build: ../back-end
+    depends_on:
+      - postgres
 
   frontend:
     build: ../front-end
@@ -17,6 +19,15 @@ services:
     volumes:
       - assets-volume:/frontend:ro
       - ./nginx.conf:/etc/nginx/nginx.conf
+
+  postgres:
+    image: postgres:alpine
+    ports:
+        - "5432:5432"
+    environment:
+        POSTGRES_USER: "postgres"
+        POSTGRES_PASSWORD: "password"
+        POSTGRES_DB: "web_pages_db"
 
 volumes:
   assets-volume:

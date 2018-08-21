@@ -13,7 +13,7 @@ namespace WebMonitorApi.Controllers
   [Route("api/[controller]")]
   public class WebPagesController : Controller
   {
-    private static IRepository<WebPage> repository;
+    private IRepository<WebPage> repository;
 
     // GET api/webpages
     [HttpGet]
@@ -47,10 +47,9 @@ namespace WebMonitorApi.Controllers
       repository.Delete(id);
     }
 
-    public WebPagesController(IRepository<WebPage> rep)
+    public WebPagesController(IRepository<WebPage> repository)
     {
-      if (repository == null)
-        repository = rep;
+      this.repository = repository;
     }
   }
 }

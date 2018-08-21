@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebMonitorApi.Models;
@@ -7,43 +8,51 @@ namespace WebMonitorApi.Repository
 {
   public class WebPages : IRepository<WebPage>
   {
-    private IList<WebPage> pages;
-
-    private static int lastIndex = 1;
+    private WebPagesContext context;
 
     public void Delete(int id)
     {
-      var page = this.pages.FirstOrDefault(p => p.Id == id);
-      this.pages.Remove(page);
+      var page = this.Get(id);
+      this.context.Pages.Remove(page);
+      this.context.SaveChanges();
     }
 
     public WebPage Get(int id)
     {
-      return this.pages.FirstOrDefault(p => p.Id == id);
+      return this.context.Pages.FirstOrDefault(p => p.Id == id);
     }
 
     public IEnumerable<WebPage> GetAll()
     {
-      return this.pages;
+      return this.context.Pages.ToList();
     }
 
     public void Save(WebPage entity)
     {
-      if (entity.Id == 0)
+      var entry = context.Entry(entity);
+      switch (entry.State)
       {
-        entity.Id = lastIndex++;
+        case EntityState.Detached:
+          context.Add(entity);
+          break;
+        case EntityState.Modified:
+          context.Update(entity);
+          break;
+        case EntityState.Added:
+          context.Add(entity);
+          break;
+        case EntityState.Unchanged:  
+          break;
+
+        default:
+          throw new ArgumentOutOfRangeException();
       }
-      else
-      {
-        var page = this.pages.FirstOrDefault(p => p.Id == entity.Id);
-        this.pages.Remove(page);
-      }
-      this.pages.Add(entity);
+      this.context.SaveChanges();
     }
 
-    public WebPages()
+    public WebPages(WebPagesContext context)
     {
-      this.pages = new List<WebPage>();
+      this.context = context;
     }
   }
 }
