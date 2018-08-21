@@ -15,8 +15,6 @@ namespace WebMonitorApi.Controllers
   {
     private static IRepository<WebPage> repository;
 
-    private WebPagesMonitor monitor;
-
     // GET api/webpages
     [HttpGet]
     public IEnumerable<WebPage> GetAll()
@@ -39,7 +37,6 @@ namespace WebMonitorApi.Controllers
         return this.BadRequest();
 
       repository.Save(value);
-      this.RestartMonitor();
       return this.Created($"/webpages/{value.Id}", value);
     }
 
@@ -48,32 +45,12 @@ namespace WebMonitorApi.Controllers
     public void Delete(int id)
     {
       repository.Delete(id);
-      this.RestartMonitor();
     }
 
-    private void RestartMonitor()
-    {
-      this.monitor.Start(repository.GetAll(), TimeSpan.FromSeconds(15));
-    }
-
-    private static async void MonitorUpdatedHandler(IEnumerable<IWebPage> pages)
-    {
-      var connection = new HubConnectionBuilder()
-        .WithUrl("http://localhost:54131/updateHub")
-        .Build();
-      await connection.StartAsync();
-      await connection.InvokeAsync("Update", pages);
-      await connection.StopAsync();
-    }
-
-    public WebPagesController(IRepository<WebPage> rep, WebPagesMonitor monitor)
+    public WebPagesController(IRepository<WebPage> rep)
     {
       if (repository == null)
         repository = rep;
-      this.monitor = monitor;
-      this.monitor.Start(repository.GetAll(), TimeSpan.FromSeconds(15));
-      this.monitor.Updated -= MonitorUpdatedHandler;
-      this.monitor.Updated += MonitorUpdatedHandler;
     }
   }
 }

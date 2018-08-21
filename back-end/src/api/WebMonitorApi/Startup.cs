@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monitor;
+using System.Collections.Generic;
+using WebMonitorApi.Broadcast;
 using WebMonitorApi.Hubs;
 using WebMonitorApi.Models;
 using WebMonitorApi.Repository;
-using Microsoft.AspNetCore.HttpOverrides;
 
 namespace WebMonitorApi
 {
@@ -21,8 +23,7 @@ namespace WebMonitorApi
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddMvc();
-      services.AddSignalR()
-        .AddHubOptions<UpdateStatusHub>((hub) =>
+      services.AddSignalR().AddHubOptions<UpdateStatusHub>((hub) =>
       {
         hub.EnableDetailedErrors = true;
       });
@@ -49,7 +50,6 @@ namespace WebMonitorApi
         app.UseDeveloperExceptionPage();
       }
 
-      app.UseMvc();
       app.UseCors("SiteCorsPolicy");
 
       app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -61,6 +61,10 @@ namespace WebMonitorApi
       {
         routes.MapHub<UpdateStatusHub>("/updateHub");
       });
+
+      app.UseBroadcast();
+
+      app.UseMvc();
     }
 
     public Startup(IConfiguration configuration)

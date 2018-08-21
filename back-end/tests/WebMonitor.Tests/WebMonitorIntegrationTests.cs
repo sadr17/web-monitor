@@ -46,11 +46,7 @@ namespace WebMonitor.Tests
     [Fact]
     public async void WebPagesDeleteAndGet()
     {
-      var page = new WebPage()
-      {
-        DisplayName = TestName,
-        Link = new Uri(TestUriString)
-      };
+      var page = GetDefaultPage();
       var content = new StringContent(JsonConvert.SerializeObject(page), Encoding.UTF8, "application/json");
 
       HttpResponseMessage postResponse = await testClient.PostAsync(WebPagesRequestUri, content);
@@ -64,6 +60,15 @@ namespace WebMonitor.Tests
       string raw = await getResponse.Content.ReadAsStringAsync();
       page = JsonConvert.DeserializeObject<WebPage>(raw);
       Assert.Null(page);
+    }
+
+    private WebPage GetDefaultPage()
+    {
+      return new WebPage()
+      {
+        DisplayName = TestName,
+        Link = new Uri(TestUriString)
+      };
     }
 
     public WebMonitorIntegrationTests()

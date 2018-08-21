@@ -19,7 +19,7 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void CreateWebPage()
     {
-      var controller = new WebPagesController(new WebPages(), new WebPagesMonitor());
+      var controller = new WebPagesController(new WebPages());
       var pages = controller.GetAll();
       var original = new List<WebPage>(pages);
 
@@ -34,14 +34,15 @@ namespace WebMonitor.Tests
 
       Assert.AreEqual(newPages.Count, original.Count + 1);
 
-      var addedPage = newPages.FirstOrDefault(page => page.DisplayName == TestName && page.Link.ToString().Equals(TestUriString));
+      var addedPage = newPages
+        .FirstOrDefault(page => page.DisplayName == TestName && page.Link.ToString().Equals(TestUriString));
       Assert.IsNotNull(addedPage);
     }
 
     [TestMethod]
     public void DeleteWebPage()
     {
-      var controller = new WebPagesController(new WebPages(), new WebPagesMonitor());
+      var controller = new WebPagesController(new WebPages());
 
       var p = new WebPage()
       {
@@ -61,7 +62,7 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void UpdatePage()
     {
-      var controller = new WebPagesController(new WebPages(), new WebPagesMonitor());
+      var controller = new WebPagesController(new WebPages());
 
       var p = new WebPage()
       {
