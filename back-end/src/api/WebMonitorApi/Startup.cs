@@ -7,6 +7,7 @@ using Monitor;
 using WebMonitorApi.Hubs;
 using WebMonitorApi.Models;
 using WebMonitorApi.Repository;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace WebMonitorApi
 {
@@ -20,7 +21,11 @@ namespace WebMonitorApi
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddMvc();
-      services.AddSignalR();
+      services.AddSignalR()
+        .AddHubOptions<UpdateStatusHub>((hub) =>
+      {
+        hub.EnableDetailedErrors = true;
+      });
 
       services.AddScoped<IRepository<WebPage>, WebPages>();
       services.AddSingleton<WebPagesMonitor>();
@@ -46,6 +51,12 @@ namespace WebMonitorApi
 
       app.UseMvc();
       app.UseCors("SiteCorsPolicy");
+
+      app.UseForwardedHeaders(new ForwardedHeadersOptions
+      {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+      });
+
       app.UseSignalR(routes =>
       {
         routes.MapHub<UpdateStatusHub>("/updateHub");

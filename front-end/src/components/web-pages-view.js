@@ -123,11 +123,11 @@ export class WebPagesView extends React.PureComponent {
   }
 
   getApiUrl = () => {
-    return process.env.REACT_APP_API_URL + process.env.REACT_APP_API_PATH;
+    return "/api/webpages";
   }
 
   getUpdateUrl = () => {
-    return process.env.REACT_APP_API_URL + process.env.REACT_APP_UPDATE_PATH;
+    return "/updateHub";
   }
 
   componentDidMount() {

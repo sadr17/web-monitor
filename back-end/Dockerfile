@@ -1,6 +1,5 @@
 FROM microsoft/aspnetcore:2.0 AS base
 WORKDIR /app
-EXPOSE 80
 
 FROM microsoft/aspnetcore-build:2.0 AS build
 WORKDIR /back-end
@@ -18,5 +17,5 @@ RUN dotnet publish WebMonitor.sln -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-EXPOSE 54131
+EXPOSE 80
 ENTRYPOINT ["dotnet", "WebMonitorApi.dll"]
