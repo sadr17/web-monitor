@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Monitor;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WebMonitorApi.Hubs;
 using WebMonitorApi.Models;
 
 namespace WebMonitorApi.Broadcast
@@ -21,8 +23,7 @@ namespace WebMonitorApi.Broadcast
     #region Constants
 
     private const string ApiPath = "/api/webpages";
-    private const string UpdateHubPath = "/updateHub";
-    private const string UpdateMethodName = "Update";
+    private const string UpdateMethodName = "UpdateStatus";
     public readonly TimeSpan DefaultInterval = TimeSpan.FromSeconds(5);
 
     #endregion
@@ -35,7 +36,9 @@ namespace WebMonitorApi.Broadcast
 
     private WebPagesMonitor monitor;
 
-    private HubConnection connection;
+    //private HubConnection connection;
+
+    IHubContext<UpdateStatusHub> hub;
 
     public string Url { get; private set; } = null;
 
@@ -158,23 +161,17 @@ namespace WebMonitorApi.Broadcast
 
     private async void BroadcastHandler(IEnumerable<IWebPage> pages)
     {
-      if (this.connection == null)
-      {
-        this.connection = new HubConnectionBuilder()
-          .WithUrl($"{this.Url}/{UpdateHubPath}")
-          .Build();
-        await connection.StartAsync();
-      }
-      await connection.InvokeAsync(UpdateMethodName, pages);
+      await this.hub.Clients.All.SendAsync(UpdateMethodName, pages);
     }
 
     #endregion
 
     #region Constructors
 
-    public Broadcast(RequestDelegate next, WebPagesMonitor monitor)
+    public Broadcast(RequestDelegate next, WebPagesMonitor monitor, IHubContext<UpdateStatusHub> hub)
     {
       this.next = next;
+      this.hub = hub;
       this.pages = new ConcurrentDictionary<int, WebPage>();
       this.monitor = monitor;
       this.monitor.Updated += BroadcastHandler;
@@ -183,3 +180,4 @@ namespace WebMonitorApi.Broadcast
     #endregion
   }
 }
+

@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebMonitorApi.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace WebMonitorApi.Hubs
 {
@@ -12,16 +7,6 @@ namespace WebMonitorApi.Hubs
   /// </summary>
   public class UpdateStatusHub : Hub
   {
-    /// <summary>
-    /// Update status of pages.
-    /// </summary>
-    /// <param name="pages"></param>
-    /// <returns></returns>
-    public async Task Update(IEnumerable<WebPage> pages)
-    {
-      await this.Clients
-        .AllExcept(this.Context.ConnectionId)
-        .SendAsync("UpdateStatus", pages);
-    }
   }
 }
+
