@@ -16,6 +16,7 @@ services:
       - "80:80"
     depends_on:
       - frontend
+      - backend
     volumes:
       - assets-volume:/frontend:ro
       - ./nginx.conf:/etc/nginx/nginx.conf
@@ -28,6 +29,8 @@ services:
         POSTGRES_USER: "postgres"
         POSTGRES_PASSWORD: "password"
         POSTGRES_DB: "web_pages_db"
+    volumes:
+        - .:/tmp/data/
 
 volumes:
   assets-volume:
