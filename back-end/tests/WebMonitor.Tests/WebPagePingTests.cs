@@ -29,7 +29,7 @@ namespace WebMonitor.Tests
     {
       var monitor = new WebPagePing();
       var statusCode = monitor.GetStatus(new Uri("https://vsdrr3.ru"));
-      Assert.AreEqual(null, statusCode);
+      Assert.AreEqual(HttpStatusCode.NotFound, statusCode);
     }
   }
 }

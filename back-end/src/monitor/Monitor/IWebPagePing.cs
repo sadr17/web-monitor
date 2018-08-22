@@ -14,6 +14,6 @@ namespace Monitor
     /// </summary>
     /// <param name="page">Web page which need to check.</param>
     /// <returns>Web page status.</returns>
-    HttpStatusCode? GetStatus(Uri webPageLink);
+    HttpStatusCode GetStatus(Uri webPageLink);
   }
 }

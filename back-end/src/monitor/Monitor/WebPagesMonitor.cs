@@ -1,6 +1,7 @@
 ﻿using Monitor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Timers;
 
 namespace Monitor
@@ -21,8 +22,10 @@ namespace Monitor
     private void TimerHandler(object sender, ElapsedEventArgs e)
     {
       foreach (var page in this.pages)
-        page.Status = this.ping.GetStatus(page.Link)?.ToString();
-      this.Updated?.Invoke(this.pages);
+        page.Status = this.ping.GetStatus(page.Link).ToString();
+
+      if (this.pages?.Any() == true)
+        this.Updated?.Invoke(this.pages);
     }
 
     /// <summary>

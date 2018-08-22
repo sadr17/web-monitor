@@ -11,7 +11,7 @@ namespace Monitor
   {
     #region IWebPagePing
 
-    public HttpStatusCode? GetStatus(Uri link)
+    public HttpStatusCode GetStatus(Uri link)
     {
       try
       {
@@ -25,7 +25,7 @@ namespace Monitor
       }
       catch (AggregateException)
       {
-        return null;
+        return HttpStatusCode.NotFound;
       }
     }
 

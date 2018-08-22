@@ -13,6 +13,9 @@ namespace WebMonitorApi.Repository
     public void Delete(int id)
     {
       var page = this.Get(id);
+      if (page == null)
+        return; 
+
       this.context.Pages.Remove(page);
       this.context.SaveChanges();
     }
@@ -29,24 +32,11 @@ namespace WebMonitorApi.Repository
 
     public void Save(WebPage entity)
     {
-      var entry = context.Entry(entity);
-      switch (entry.State)
-      {
-        case EntityState.Detached:
-          context.Add(entity);
-          break;
-        case EntityState.Modified:
-          context.Update(entity);
-          break;
-        case EntityState.Added:
-          context.Add(entity);
-          break;
-        case EntityState.Unchanged:  
-          break;
-
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
+      var existedEntity = this.Get(entity.Id);
+      if (existedEntity == null)
+        context.Update(entity);
+      else
+        context.Add(entity);
       this.context.SaveChanges();
     }
 
