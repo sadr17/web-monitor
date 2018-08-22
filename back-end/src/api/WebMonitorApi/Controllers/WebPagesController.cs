@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR.Client;
 using Monitor;
@@ -9,6 +10,7 @@ using WebMonitorApi.Repository;
 
 namespace WebMonitorApi.Controllers
 {
+  [Authorize]
   [EnableCors("SiteCorsPolicy")]
   [Route("api/[controller]")]
   public class WebPagesController : Controller
@@ -16,6 +18,7 @@ namespace WebMonitorApi.Controllers
     private IRepository<WebPage> repository;
 
     // GET api/webpages
+    [AllowAnonymous]
     [HttpGet]
     public IEnumerable<WebPage> GetAll()
     {
@@ -23,6 +26,7 @@ namespace WebMonitorApi.Controllers
     }
 
     // GET api/webpages/5
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public WebPage Get(int id)
     {

@@ -1,17 +1,22 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monitor;
+using System.Linq;
 using WebMonitorApi.Broadcast;
 using WebMonitorApi.Hubs;
 using WebMonitorApi.Models;
 using WebMonitorApi.Repository;
 
-namespace WebMonitorApi {
+namespace WebMonitorApi
+{
 
   /// <summary>
   /// Web API startup class.
@@ -48,6 +53,17 @@ namespace WebMonitorApi {
         {
           options.UseNpgsql(ConnectionString);
         });
+
+      services.AddAuthorization(x =>
+      {
+        x.DefaultPolicy = new AuthorizationPolicyBuilder()
+                                .RequireAssertion((ctx) => {
+                                  var httpContext = ((ActionContext)ctx.Resource).HttpContext;
+                                  var headers = (FrameRequestHeaders)httpContext.Request.Headers;
+                                  return headers.HeaderAuthorization.Any();
+                                })
+                                .Build();
+      });
 
       services.AddScoped<IRepository<WebPage>, WebPages>();
       services.AddSingleton<WebPagesMonitor>();

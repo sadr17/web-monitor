@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
-import {EditingState} from '@devexpress/dx-react-grid';
+import {EditingState, DataTypeProvider} from '@devexpress/dx-react-grid';
 import {
   Grid,
   Table, 
@@ -22,6 +22,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
+import Chip from '@material-ui/core/Chip';
 import * as signalR from '@aspnet/signalr'
 
   const AddButton = ({ onExecute }) => (
@@ -53,6 +54,26 @@ import * as signalR from '@aspnet/signalr'
       <CancelIcon />
     </IconButton>
   );
+
+  const StatusFormatter = ({ value }) => {
+    let color = value === 'OK' ? 'primary' : 'secondary';
+    let text = value;
+    if (value === null) {
+      color = 'default';
+      text = 'InProgress';
+    }
+
+    return (
+       <Chip label={text} color={color} />
+    );
+  }
+
+  const StatusTypeProvider = props => (
+    <DataTypeProvider
+      formatterComponent={StatusFormatter}
+      {...props}
+    />
+  );
   
   const commandComponents = {
     add: AddButton,
@@ -75,15 +96,21 @@ import * as signalR from '@aspnet/signalr'
     return <TableEditRow.Cell {...props} />;
   };
 
-  const sendRequest = (url, methodName, body) => {
+  const sendRequest = (url, methodName, body, token) => {
+    const Authorization = token !== null ? 'Bearer ' + token : null;
     return fetch(url, {
       method: methodName,
-      headers: {'Content-Type':'application/json', Accept: 'application/json'},
+      headers: {'Content-Type':'application/json',
+       Accept: 'application/json', 
+       Authorization
+      },
       body: body,
     }).catch(() => console.log('Error during request to server: method='+methodName+'.'));
   }
 
   const getRowId = (row) => row.id;
+
+  const FAKE_TOKEN = "WEQWE//1asd2kgfg3434ldmdnbcvoireoir!q23--234j"
 
 export class WebPagesView extends React.PureComponent {
   
@@ -111,6 +138,7 @@ export class WebPagesView extends React.PureComponent {
       deletingRows: [],
       loading: true,
       hubConnection: null,
+      token: props.role === 'Admin' ? FAKE_TOKEN : null
     };
     this.getStateDeletingRows = this.getStateDeletingRows.bind(this);
     this.getStateRows = this.getStateRows.bind(this);
@@ -135,8 +163,10 @@ export class WebPagesView extends React.PureComponent {
     this.createHub()  
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     this.loadData();
+    if (this.props.role !== prevProps.role)
+      this.setState({ token: this.props.role === 'Admin' ? FAKE_TOKEN : null});
   }
 
   getStateDeletingRows() {
@@ -148,6 +178,10 @@ export class WebPagesView extends React.PureComponent {
     const { rows } = this.state;
     return rows;
   };
+
+  hasToken = () => {
+    return this.state.token !== null;
+  }
 
   changeEditingRowIds(editingRowIds) {
       this.setState({ editingRowIds });
@@ -167,10 +201,10 @@ export class WebPagesView extends React.PureComponent {
   }
 
   commitChanges ({ added, changed, deleted }) {
-    let { rows } = this.state;
+    let { rows, token } = this.state;
     if (added) {
       const addedPage = JSON.stringify(added[0]);
-      sendRequest(this.getApiUrl(), 'post', addedPage)
+      sendRequest(this.getApiUrl(), 'post', addedPage, token)
       .then(result => result.json())
       .then((data) => {
         rows = [...rows, data];
@@ -180,7 +214,7 @@ export class WebPagesView extends React.PureComponent {
     else if (changed) {     
       const item = rows.filter(row => changed[row.id])[0];       
       const updatedPage = JSON.stringify({ ...item, ...changed[item.id] });
-      sendRequest(this.getApiUrl(), 'post', updatedPage)
+      sendRequest(this.getApiUrl(), 'post', updatedPage, token)
       .then(result => result.json())
       .then((data) => {
         rows = rows.map(row => (changed[row.id] ? { ...row, ...data } : row));
@@ -197,10 +231,11 @@ export class WebPagesView extends React.PureComponent {
 
   deleteRows() {
     const rows = this.getStateRows().slice();
+    const { token } = this.state;
     this.getStateDeletingRows().forEach((rowId) => {
       const index = rows.findIndex((row) => row.id === rowId);
       if (index > -1) {
-        sendRequest(this.getApiUrl()+ '/' + rowId, 'delete', null)
+        sendRequest(this.getApiUrl()+ '/' + rowId, 'delete', null, token)
         .then((result) => {
           rows.splice(index, 1);
           this.setState({ rows, deletingRows: [] });
@@ -230,7 +265,7 @@ export class WebPagesView extends React.PureComponent {
       this.setState({ loading: false });
       return;
     }
-    sendRequest(this.getApiUrl(), 'GET', null)
+    sendRequest(this.getApiUrl(), 'GET', null, null)
     .then(result => result.json())
     .then((data) => {
         this.setState({
@@ -259,6 +294,7 @@ export class WebPagesView extends React.PureComponent {
         <Grid rows={rows}
           columns={columns}
           getRowId={getRowId} >
+          <StatusTypeProvider for={['status']} />
           <EditingState  editingRowIds={editingRowIds}
             columnExtensions={editingStateColumnExtensions}
             onEditingRowIdsChange={this.changeEditingRowIds}
@@ -270,11 +306,11 @@ export class WebPagesView extends React.PureComponent {
            <VirtualTable columnExtensions={tableColumnExtensions} />
           <TableHeaderRow />
           <TableEditRow cellComponent={EditCell} />
-          <TableEditColumn width={120}
+          {this.hasToken() && <TableEditColumn width={120}
             showAddCommand={!addedRows.length}
             showEditCommand
             showDeleteCommand
-            commandComponent={Command} />
+            commandComponent={Command} />}
         </Grid>
         <Dialog open={!!deletingRows.length}
           onClose={this.cancelDelete} >
@@ -284,6 +320,7 @@ export class WebPagesView extends React.PureComponent {
             <Paper>
               <Grid rows={rows.filter((row) => row.id === deletingRows[0])}
                 columns={columns} >
+                <StatusTypeProvider for={['status']} />
                 <Table columnExtensions={tableColumnExtensions} cellComponent={Cell} />
                 <TableHeaderRow />
               </Grid>
