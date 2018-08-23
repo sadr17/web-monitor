@@ -1,14 +1,11 @@
 version: '3'
 services:
   backend:
-    image: sadrito/monitor-backend
+    build: 
+       context: ./
+       dockerfile: Dockerfile-test
     depends_on:
       - postgres
-
-  frontend:
-    image: sadrito/monitor-frontend
-    ports:
-      - "80:80"
 
   postgres:
     image: postgres:alpine
@@ -19,4 +16,5 @@ services:
         POSTGRES_PASSWORD: "password"
         POSTGRES_DB: "web_pages_db"
     volumes:
-        - .:/tmp/data/
+        - .:/tmp/data
+

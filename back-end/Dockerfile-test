@@ -1,0 +1,13 @@
+#FROM microsoft/aspnetcore:2.0 AS base
+#WORKDIR /app
+
+FROM microsoft/aspnetcore-build:2.0 AS build
+WORKDIR /back-end
+COPY *.sln ./
+COPY ./src/api/WebMonitorApi/WebMonitorApi.csproj ./src/api/WebMonitorApi/
+COPY ./src/monitor/Monitor/Monitor.csproj ./src/monitor/Monitor/
+COPY ./tests/WebMonitor.Tests/WebMonitor.Tests.csproj ./tests/WebMonitor.Tests/WebMonitor.Tests.csproj
+RUN dotnet restore
+COPY . .
+CMD ["dotnet", "test", "./tests/WebMonitor.Tests/WebMonitor.Tests.csproj"]
+

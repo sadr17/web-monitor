@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,10 +33,14 @@ namespace WebMonitorApi.Repository
     public void Save(WebPage entity)
     {
       var existedEntity = this.Get(entity.Id);
-      if (existedEntity == null)
-        context.Update(entity);
+      if (existedEntity != null)
+      {
+        context.Entry(existedEntity).CurrentValues.SetValues(entity);
+//        context.Pages.Attach(existedEntity);
+//        context.Pages.Update(entity);
+      }
       else
-        context.Add(entity);
+        context.Pages.Add(entity);
       this.context.SaveChanges();
     }
 
@@ -46,3 +50,4 @@ namespace WebMonitorApi.Repository
     }
   }
 }
+

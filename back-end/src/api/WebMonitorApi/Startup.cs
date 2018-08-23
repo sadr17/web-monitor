@@ -59,8 +59,8 @@ namespace WebMonitorApi
         x.DefaultPolicy = new AuthorizationPolicyBuilder()
                                 .RequireAssertion((ctx) => {
                                   var httpContext = ((ActionContext)ctx.Resource).HttpContext;
-                                  var headers = (FrameRequestHeaders)httpContext.Request.Headers;
-                                  return headers.HeaderAuthorization.Any();
+                                  var headers = httpContext.Request.Headers as FrameRequestHeaders;
+                                  return headers == null || headers.HeaderAuthorization.Any();
                                 })
                                 .Build();
       });

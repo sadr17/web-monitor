@@ -1,13 +1,19 @@
 # build environment
-FROM node
+FROM node as builder
 
 WORKDIR /frontend
-COPY . .
-# ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
-
-COPY package.json /usr/src/app/package.json
+ENV PATH /frontend/node_modules/.bin:$PATH
+COPY package.json /frontend/package.json
 RUN npm install --silent && npm install react-scripts@1.1.1 --silent
 
-CMD ["npm", "run-script", "build"]
+COPY . .
+RUN npm run build
+
+# production environment
+FROM nginx:alpine
+COPY --from=builder /frontend/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
 
