@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using WebMonitorApi.Models;
@@ -34,11 +32,7 @@ namespace WebMonitorApi.Repository
     {
       var existedEntity = this.Get(entity.Id);
       if (existedEntity != null)
-      {
         context.Entry(existedEntity).CurrentValues.SetValues(entity);
-//        context.Pages.Attach(existedEntity);
-//        context.Pages.Update(entity);
-      }
       else
         context.Pages.Add(entity);
       this.context.SaveChanges();
