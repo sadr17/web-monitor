@@ -36,11 +36,7 @@ namespace WebMonitorApi.Broadcast
 
     private WebPagesMonitor monitor;
 
-    //private HubConnection connection;
-
     IHubContext<UpdateStatusHub> hub;
-
-    public string Url { get; private set; } = null;
 
     #endregion
 
@@ -48,7 +44,6 @@ namespace WebMonitorApi.Broadcast
 
     public async Task InvokeAsync(HttpContext context)
     {
-      this.UpdateUrl(context);
       var request = context.Request;
       if (!request.Path.StartsWithSegments(ApiPath))
       {
@@ -61,16 +56,6 @@ namespace WebMonitorApi.Broadcast
       await this.TryHandleDeleteRequest(context);
 
       this.RestartMonitor();
-    }
-
-    private void UpdateUrl(HttpContext context)
-    {
-      if (this.Url != null)
-        return;
-
-      this.Url = context.Request
-        .GetDisplayUrl()
-        .Replace(context.Request.Path, string.Empty);
     }
 
     private async Task TryHandleGetRequest(HttpContext context)

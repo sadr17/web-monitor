@@ -1,16 +1,20 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.IO;
 using WebMonitorApi.Models;
 
 namespace WebMonitorApi.Repository
 {
+  /// <summary>
+  /// Database context for working with web pages.
+  /// </summary>
   public class WebPagesContext : DbContext
   {
+    #region Inner class
+
+    /// <summary>
+    /// Model configuration for web page.
+    /// </summary>
     private class WebPagesModelConfiguration : IEntityTypeConfiguration<WebPage>
     {
       public void Configure(EntityTypeBuilder<WebPage> builder)
@@ -20,6 +24,11 @@ namespace WebMonitorApi.Repository
       }
     }
 
+    #endregion
+
+    /// <summary>
+    /// Web pages.
+    /// </summary>
     public DbSet<WebPage> Pages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,6 +37,10 @@ namespace WebMonitorApi.Repository
       base.OnModelCreating(modelBuilder);
     }
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="options">Database options</param>
     public WebPagesContext(DbContextOptions<WebPagesContext> options)
       : base(options)
     { }

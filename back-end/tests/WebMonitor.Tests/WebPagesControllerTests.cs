@@ -19,15 +19,11 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void CreateWebPage()
     {
-      var controller = new WebPagesController(new TestWebPages());
+      var controller = CreateController();
       var pages = controller.GetAll();
       var original = new List<WebPage>(pages);
 
-      var p = new WebPage()
-      {
-        DisplayName = TestName,
-        Link = new System.Uri(TestUriString)
-      };
+      var p = CreateDefaultPage();
       var result = controller.Post(p);
       var newWebPagesRaw = controller.GetAll();
       List<WebPage> newPages = new List<WebPage>(newWebPagesRaw);
@@ -42,13 +38,9 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void DeleteWebPage()
     {
-      var controller = new WebPagesController(new TestWebPages());
+      var controller = CreateController();
+      WebPage p = CreateDefaultPage();
 
-      var p = new WebPage()
-      {
-        DisplayName = TestName,
-        Link = new System.Uri(TestUriString)
-      };
       var result = controller.Post(p);
       var page = ((ObjectResult)result).Value as WebPage;
       Assert.IsNotNull(page);
@@ -62,13 +54,9 @@ namespace WebMonitor.Tests
     [TestMethod]
     public void UpdatePage()
     {
-      var controller = new WebPagesController(new TestWebPages());
+      var controller = CreateController();
+      var p = CreateDefaultPage();
 
-      var p = new WebPage()
-      {
-        DisplayName = TestName,
-        Link = new System.Uri(TestUriString)
-      };
       var result = controller.Post(p);
       p = ((ObjectResult)result).Value as WebPage;
       Assert.IsNotNull(p);
@@ -83,6 +71,20 @@ namespace WebMonitor.Tests
 
       var pages = controller.GetAll();
       Assert.AreEqual(pages.Count(), 1);
+    }
+
+    private static WebPage CreateDefaultPage()
+    {
+      return new WebPage()
+      {
+        DisplayName = TestName,
+        Link = new System.Uri(TestUriString)
+      };
+    }
+
+    private static WebPagesController CreateController()
+    {
+      return new WebPagesController(new TestWebPages());
     }
   }
 }

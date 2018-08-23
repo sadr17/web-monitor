@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 
 namespace Monitor
 {
+  /// <summary>
+  /// Representation of simple web page object.
+  /// </summary>
   public interface IWebPage
   {
     /// <summary>

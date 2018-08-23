@@ -1,5 +1,8 @@
 ﻿namespace WebMonitorApi.Models
 {
+  /// <summary>
+  /// Base interface for all entities.
+  /// </summary>
   public interface IEntity
   {
     /// <summary>

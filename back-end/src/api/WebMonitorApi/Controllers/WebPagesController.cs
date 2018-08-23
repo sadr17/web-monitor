@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR.Client;
-using Monitor;
-using System;
 using System.Collections.Generic;
 using WebMonitorApi.Models;
 using WebMonitorApi.Repository;
